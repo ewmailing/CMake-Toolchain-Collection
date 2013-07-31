@@ -63,7 +63,7 @@ endif()
 if("${ANDROID_NDK_ARCH}" STREQUAL "x86" )
 	set(ANDROID_NDK_ABI "x86")
 	set(ANDROID_NDK_ABI_EXT "x86")
-	set(ANDROID_NDK_GCC_PREFIX "i686-android-linux")
+	set(ANDROID_NDK_GCC_PREFIX "i686-linux-android")
 endif()
 
 if(ANDROID_NDK_TOOLCHAIN_DEBUG)
