@@ -8,7 +8,15 @@
 # Only tested with using stlport
 
 # need to know where the NDK resides
-set(ANDROID_NDK_ROOT "$ENV{NDK_TOOLCHAIN_ROOT}" CACHE PATH "Android Toolchain location")
+# Note: $ENV{ANDROID_NDK_ROOT} is the semi-official blessed environmental variable
+# for the location of the root of the Android NDK.
+# For the non-standalone toolchain, this is the directory we want and we don't need
+# a separate $ENV{NDK_TOOLCHAIN_ROOT}
+if($ENV{NDK_TOOLCHAIN_ROOT})
+	set(ANDROID_NDK_ROOT "$ENV{NDK_TOOLCHAIN_ROOT}" CACHE PATH "Android Toolchain location")
+else()
+	set(ANDROID_NDK_ROOT "$ENV{ANDROID_NDK_ROOT}" CACHE PATH "Android Toolchain location")
+endif()
 
 # set(ANDROID_NDK_TOOLCHAIN_DEBUG ON)
 
@@ -83,16 +91,18 @@ set_property(CACHE ANDROID_NDK_STL PROPERTY STRINGS ${ANDROID_NDK_STL_SUPPORTED}
 
 
 # set the Android Platform
-set(ANDROID_API_SUPPORTED "android-8;android-9;android-14")
-set(ANDROID_API "android-9" CACHE STRING "Android SDK API (${ANDROID_API_SUPPORTED})")
+set(ANDROID_API_SUPPORTED "android-8;android-9;android-14;android-18")
+set(ANDROID_API "android-18" CACHE STRING "Android SDK API (${ANDROID_API_SUPPORTED})")
 set_property(CACHE ANDROID_API PROPERTY STRINGS ${ANDROID_API_SUPPORTED})
 
 # set sysroot - in Android this in function of Android API and architecture
 set(ANDROID_NDK_SYSROOT)
 if("${ANDROID_NDK_ARCH}" STREQUAL "arm" OR "${ANDROID_NDK_ARCH}" STREQUAL "armv7" )
 	set(ANDROID_NDK_SYSROOT "${ANDROID_NDK_ROOT}/platforms/${ANDROID_API}/arch-arm" CACHE PATH "NDK sysroot" FORCE)
+	message("setting ANDROID_NDK_SYSROOT to arm ${ANDROID_NDK_SYSROOT}")
 elseif("${ANDROID_NDK_ARCH}" STREQUAL "x86")
 	set(ANDROID_NDK_SYSROOT "${ANDROID_NDK_ROOT}/platforms/${ANDROID_API}/arch-x86" CACHE PATH "NDK sysroot" FORCE)
+	message("setting ANDROID_NDK_SYSROOT to x86 ${ANDROID_NDK_SYSROOT}")
 endif()
 
 # set(CMAKE_C_COMPILER_WORKS 1)
@@ -101,7 +111,7 @@ endif()
 # set(CMAKE_SKIP_COMPATIBILITY_TESTS 1)
 
 # set version
-set(ANDROID_NDK_GCC_VERSION "4.7")
+set(ANDROID_NDK_GCC_VERSION "4.6")
 
 # STL
 set(ANDROID_NDK_STL_CXXFLAGS)
@@ -154,10 +164,11 @@ get_filename_component(ANDROID_NDK_GCC_COMPANIONLIBRARY_PATH ${ANDROID_NDK_GCC_C
 # CMAKE_FORCE_C_COMPILER("${CMAKE_C_COMPILER}" GNU)
 # CMAKE_FORCE_CXX_COMPILER("${CMAKE_CXX_COMPILER}" GNU)
 
-set(COMMON_FLAGS "${CMAKE_C_FLAGS} --sysroot=${ANDROID_NDK_SYSROOT}")
+#set(COMMON_FLAGS "${CMAKE_C_FLAGS} --sysroot=${ANDROID_NDK_SYSROOT}")
+set(COMMON_FLAGS "${CMAKE_C_FLAGS}")
 
-set(CMAKE_C_FLAGS "${COMMON_FLAGS}" CACHE STRING "C Flags" FORCE)
-set(CMAKE_CXX_FLAGS "${COMMON_FLAGS} ${ANDROID_NDK_STL_CXXFLAGS} -L${ANDROID_NDK_STL_LIBRARYPATH} ${ANDROID_NDK_STL_LDFLAGS}" CACHE STRING "C++ Flags" FORCE)
+set(CMAKE_C_FLAGS "${COMMON_FLAGS} --sysroot=${ANDROID_NDK_SYSROOT}" CACHE STRING "C Flags" FORCE)
+set(CMAKE_CXX_FLAGS "${COMMON_FLAGS} --sysroot=${ANDROID_NDK_SYSROOT} ${ANDROID_NDK_STL_CXXFLAGS} -L${ANDROID_NDK_STL_LIBRARYPATH} ${ANDROID_NDK_STL_LDFLAGS}" CACHE STRING "C++ Flags" FORCE)
 
 set(CMAKE_C_COMPILER ${ANDROID_NDK_GCC_PREFIX}-gcc)
 set(CMAKE_CXX_COMPILER ${ANDROID_NDK_GCC_PREFIX}-g++)
