@@ -42,14 +42,21 @@ if("${ANDROID_NDK_ARCH}" STREQUAL "armv7" )
 	set(ANDROID_NDK_ABI "armeabi-v7a")
 	set(ANDROID_NDK_ABI_EXT "arm-linux-androideabi")
 	set(ANDROID_NDK_GCC_PREFIX "arm-linux-androideabi")
-	set(ANDROID_NDK_ARCH_CFLAGS "-march=armv7-a -mfloat-abi=softfp")
+	set(ANDROID_NDK_ARCH_CFLAGS "-march=armv7-a -mfloat-abi=softfp -finline-limit=64")
 	set(ANDROID_NDK_ARCH_LDFLAGS "-Wl,--fix-cortex-a8")
 endif()
 if("${ANDROID_NDK_ARCH}" STREQUAL "x86" )
 	set(ANDROID_NDK_ABI "x86")
 	set(ANDROID_NDK_ABI_EXT "x86")
-	set(ANDROID_NDK_GCC_PREFIX "i686-android-linux")
+	set(ANDROID_NDK_GCC_PREFIX "i686-linux-android")
+	#	set(ANDROID_NDK_ARCH_CFLAGS "-finline-limit=300")
+		set(ANDROID_NDK_ARCH_CFLAGS "-ffunction-sections -funwind-tables -no-canonical-prefixes -fstack-protector -fomit-frame-pointer -fstrict-aliasing -funswitch-loops -finline-limit=300 -UNDEBUG -fno-omit-frame-pointer -fno-strict-aliasing -DANDROID  -Wa,--noexecstack")
+
+
+		set(ANDROID_NDK_ARCH_LDFLAGS "-lgcc -no-canonical-prefixes  -Wl,--no-undefined -Wl,-z,noexecstack -Wl,-z,relro -Wl,-z,now   -lc -lm")
 endif()
+
+
 
 if(ANDROID_NDK_TOOLCHAIN_DEBUG)
 	message(STATUS "ANDROID_NDK_ABI - ${ANDROID_NDK_ABI}")
@@ -58,8 +65,8 @@ if(ANDROID_NDK_TOOLCHAIN_DEBUG)
 endif()
 
 # global C flags
-set(ANDROID_NDK_GLOBAL_CFLAGS "-DANDROID -fomit-frame-pointer -fno-strict-aliasing -finline-limit=64 -ffunction-sections -funwind-tables")
-set(ANDROID_NDK_GLOBAL_CXXFLAGS "-fno-exceptions -fno-rtti")
+#set(ANDROID_NDK_GLOBAL_CFLAGS "-DANDROID -fomit-frame-pointer -fno-strict-aliasing -ffunction-sections -funwind-tables")
+#set(ANDROID_NDK_GLOBAL_CXXFLAGS "-fno-exceptions -fno-rtti")
 
 # set the Android Platform
 set(ANDROID_API_SUPPORTED "android-8;android-9;android-14")
@@ -74,7 +81,7 @@ set(ANDROID_NDK_GCC_VERSION "4.4.3")
 
 # global linker flags
 #  -Wl,-z,noexecstack -Wl,--gc-sections -Wl,-z,nocopyreloc
-set(ANDROID_NDK_GLOBAL_LDFLAGS "-Wl,--no-undefined -Wl,-z,noexecstack -Wl,--fix-cortex-a8 ")
+#set(ANDROID_NDK_GLOBAL_LDFLAGS "-Wl,--no-undefined -Wl,-z,noexecstack")
 
 
 # linker flags (here only one thing missing here is lstdc++ - in Android the actual STL implementation is user dependent!)
